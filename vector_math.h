@@ -7,6 +7,20 @@ namespace floral
 {
 // ----------------------------------------------------------------------------
 
+struct float2
+{
+	f32 x;
+	f32 y;
+
+	FLORAL_INLINE float2()
+		: x(0), y(0)
+	{ }
+
+	FLORAL_INLINE float2(f32 i_x, f32 i_y)
+		: x(i_x), y(i_y)
+	{ }
+};
+
 struct float4
 {
 	f32 x;

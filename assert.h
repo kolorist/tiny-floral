@@ -20,7 +20,7 @@ assert_action_e assertion_report_msg(const_cstr expr, const_cstr msg, const_cstr
 assert_action_e assertion_report_msgonly(const_cstr msg, const_cstr file, const u32 line);
 assert_action_e assertion_report_dlg(const_cstr title, const_cstr msg, const_cstr file, const u32 line);
 
-#if defined(FLORAL_PLATFORM_WINDOWS) || defined(FLORAL_PLATFORM_XBOX_SCARLETT)
+#if defined(FLORAL_PLATFORM_WINDOWS)
 #if !defined(NDEBUG)
 #	define FLORAL_DEBUG_BREAK						__debugbreak
 

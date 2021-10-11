@@ -39,12 +39,16 @@ struct float4
 
 struct vec4f
 {
-	f32 x;
-	f32 y;
-	f32 z;
-	f32 w;
 	union
 	{
+		struct
+		{
+			f32 x;
+			f32 y;
+			f32 z;
+			f32 w;
+		};
+
 		f32 elems[4];
 	};
 };

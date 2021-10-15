@@ -57,7 +57,6 @@ static inline voidptr align_address(voidptr i_addr, const size i_alignment)
     return (voidptr)(align_aptr((aptr)i_addr, i_alignment));
 }
 
-
 static void fill_platform_info(platform_info_t* o_platformInfo)
 {
     o_platformInfo->pageSize = SIZE_KB(4);

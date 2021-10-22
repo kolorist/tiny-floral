@@ -54,6 +54,10 @@ struct vec3f
 		: x(0), y(0), z(0)
 	{ }
 
+	FLORAL_INLINE vec3f(f32 i_value)
+		: x(i_value), y(i_value), z(i_value)
+	{ }
+
 	FLORAL_INLINE vec3f(f32 i_x, f32 i_y, f32 i_z)
 		: x(i_x), y(i_y), z(i_z)
 	{ }
@@ -144,6 +148,36 @@ struct camera_persp_t
 };
 
 #include "vector_math_mat.inl"
+
+// ----------------------------------------------------------------------------
+// quaternion
+// ----------------------------------------------------------------------------
+
+struct quaternionf
+{
+	union
+	{
+		struct
+		{
+			f32 x;
+			f32 y;
+			f32 z;
+			f32 w;
+		};
+
+		struct
+		{
+			vec3f v;
+			f32 s;
+		};
+	};
+
+	FLORAL_INLINE quaternionf()
+		: x(0), y(0), z(0), w(1)
+	{ }
+};
+
+#include "vector_math_quaternion.inl"
 
 // ----------------------------------------------------------------------------
 }

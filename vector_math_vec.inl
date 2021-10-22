@@ -13,6 +13,17 @@ FLORAL_INLINE const vec3f operator+(const vec3f& i_a, const vec3f& i_b)
 	return vec3f(i_a.x + i_b.x, i_a.y + i_b.y, i_a.z + i_b.z);
 }
 
+// scalar arithmetic
+FLORAL_INLINE const vec3f operator*(const vec3f& i_a, const f32 i_scalar)
+{
+	return vec3f(i_a.x * i_scalar, i_a.y * i_scalar, i_a.z * i_scalar);
+}
+
+FLORAL_INLINE const vec3f operator*(const f32 i_scalar, const vec3f& i_a)
+{
+	return vec3f(i_a.x * i_scalar, i_a.y * i_scalar, i_a.z * i_scalar);
+}
+
 FLORAL_INLINE const f32 length(const vec2f& i_v)
 {
 	return sqrtf(i_v.x * i_v.x + i_v.y * i_v.y);
@@ -57,4 +68,10 @@ FLORAL_INLINE const vec3f cross(const vec3f& i_a, const vec3f& i_b)
 		i_a.y * i_b.z - i_a.z * i_b.y,
 		i_a.z * i_b.x - i_a.x * i_b.z,
 		i_a.x * i_b.y - i_a.y * i_b.x);
+}
+
+FLORAL_INLINE const bool equal(const vec3f& i_a, const vec3f& i_b, const f32 i_epsilon)
+{
+	f32 disp = length(i_a - i_b);
+	return (disp < i_epsilon);
 }

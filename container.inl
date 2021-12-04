@@ -21,5 +21,11 @@ void array_push(array_t<t_value>* const i_arr, const t_value& i_value)
     i_arr->size++;
 }
 
+template <typename t_value>
+void array_empty(array_t<t_value>* const i_arr)
+{
+    i_arr->size = 0;
+}
+
 // ----------------------------------------------------------------------------
 }

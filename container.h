@@ -23,6 +23,9 @@ array_t<t_value> create_array(ssize i_capacity, voidptr i_buffer);
 template <typename t_value>
 void array_push(array_t<t_value>* const i_arr, const t_value& i_value);
 
+template <typename t_value>
+void array_empty(array_t<t_value>* const i_arr);
+
 // ----------------------------------------------------------------------------
 
 struct command_buffer_mt_t

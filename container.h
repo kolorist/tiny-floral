@@ -34,8 +34,11 @@ struct command_buffer_mt_t
     p8 cmdData[2];
 
     // multithread control
-    p8 backBuffer;
     uidx backBufferIdx;
+    p8 writePtr;
+    p8 readPtr;
+
+    p8 frontBuffer;
     floral::mutex_t mtx;
     floral::condition_variable_t frontCv;
     floral::condition_variable_t backCv;
@@ -47,6 +50,11 @@ command_buffer_mt_t create_command_buffer(voidptr i_memory, size i_size);
 void submit_buffer(command_buffer_mt_t* const i_cmdBuff);
 void begin_buffer(command_buffer_mt_t* const i_cmdBuff);
 void end_buffer(command_buffer_mt_t* const i_cmdBuff);
+
+template <typename t_value>
+void cmdbuff_read(command_buffer_mt_t* const i_cmdBuff, t_value* o_value);
+template <typename t_value>
+void cmdbuff_write(command_buffer_mt_t* const io_cmdBuff, const t_value& i_value);
 
 // ----------------------------------------------------------------------------
 #if 0

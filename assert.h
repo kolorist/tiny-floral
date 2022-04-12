@@ -44,6 +44,7 @@ assert_action_e assertion_report_dlg(const_cstr title, const_cstr msg, const_cst
 				case floral::assert_action_e::abort:	\
 					exit(1);					\
 					break;						\
+				case floral::assert_action_e::ignore:	\
 				default:						\
 					break;						\
 			}									\
@@ -60,6 +61,7 @@ assert_action_e assertion_report_dlg(const_cstr title, const_cstr msg, const_cst
 				case floral::assert_action_e::abort:	\
 					exit(1);					\
 					break;						\
+				case floral::assert_action_e::ignore:	\
 				default:						\
 					break;						\
 			}									\
@@ -76,6 +78,7 @@ assert_action_e assertion_report_dlg(const_cstr title, const_cstr msg, const_cst
 				case floral::assert_action_e::abort:	\
 					exit(1);					\
 					break;						\
+				case floral::assert_action_e::ignore:	\
 				default:						\
 					break;						\
 			}									\

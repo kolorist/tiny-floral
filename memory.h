@@ -6,8 +6,8 @@
 #define SIZE_GB(X) (SIZE_MB(X) * 1024u)
 #define SIZE_TB(X) (SIZE_GB(X) * 1024u)
 
-#define TO_KB(X) (X / 1024u)
-#define TO_MB(X) (TO_KB(X) / 1024u)
+#define TO_KB(X) (X >> 10)
+#define TO_MB(X) (TO_KB(X) >> 10)
 
 namespace floral
 {
@@ -70,7 +70,7 @@ struct pool_allocator_t : public allocator_t
 
 // ----------------------------------------------------------------------------
 
-linear_allocator_t* create_linear_allocator(const_cstr i_id, const size i_bytes);
+linear_allocator_t* create_linear_allocator(const_cstr i_id, const size i_bytes, voidptr i_userData = nullptr);
 voidptr allocate(const size i_bytes, linear_allocator_t* i_allocator);
 voidptr reallocate(voidptr i_data, const size i_newBytes, linear_allocator_t* i_allocator);
 voidptr allocate(const size i_bytes, const size i_alignment, linear_allocator_t* i_allocator);
@@ -80,6 +80,7 @@ void reset_allocator(linear_allocator_t* io_allocator);
 void destroy_allocator(linear_allocator_t* io_allocator);
 
 freelist_allocator_t* create_freelist_allocator(const_cstr i_id, const size i_bytes);
+freelist_allocator_t* create_freelist_allocator(const_cstr i_id, voidptr i_buffer, const size i_bytes);
 voidptr allocate(const size i_bytes, freelist_allocator_t* i_allocator);
 voidptr reallocate(voidptr i_data, const size i_newBytes, freelist_allocator_t* i_allocator);
 voidptr allocate(const size i_bytes, const size i_alignment, freelist_allocator_t* i_allocator);
@@ -93,6 +94,8 @@ pool_allocator_t* create_pool_allocator(const_cstr i_id, const size i_slotSize, 
 voidptr allocate(pool_allocator_t* i_allocator);
 void free(voidptr i_data, pool_allocator_t* i_allocator);
 void destroy_allocator(pool_allocator_t* io_allocator);
+
+const size get_allocated_size(voidptr i_data);
 
 // ----------------------------------------------------------------------------
 // helpers

@@ -20,16 +20,20 @@ assert_action_e assertion_report_msg(const_cstr expr, const_cstr msg, const_cstr
 assert_action_e assertion_report_msgonly(const_cstr msg, const_cstr file, const u32 line);
 assert_action_e assertion_report_dlg(const_cstr title, const_cstr msg, const_cstr file, const u32 line);
 
+#define FLORAL_CRASH						\
+{											\
+	volatile u32* crash = nullptr;			\
+	*crash = 10;							\
+}
+
 #if defined(FLORAL_PLATFORM_WINDOWS)
-#if !defined(NDEBUG)
 #	define FLORAL_DEBUG_BREAK						__debugbreak
+#else
+// TODO
+#endif
 
-#	define FLORAL_CRASH							\
-	{											\
-		volatile u32* crash = nullptr;			\
-		*crash = 10;							\
-	}
-
+#if !defined(NDEBUG)
+#if defined(FLORAL_PLATFORM_WINDOWS)
 #	define FLORAL_ASSERT(x)						\
 	do {										\
 		if (!(x)) {								\
@@ -78,35 +82,23 @@ assert_action_e assertion_report_dlg(const_cstr title, const_cstr msg, const_cst
 		}										\
 	} while(0)
 #else
-#define FLORAL_CRASH							\
-	{											\
-		volatile u32* crash = nullptr;			\
-		*crash = 10;							\
-	}
-
-#define FLORAL_ASSERT(x)						\
+#	define FLORAL_ASSERT(x)						\
 	do { (void)sizeof(x); } while(0)
 
-#define FLORAL_ASSERT_MSG(x, msg)				\
+#	define FLORAL_ASSERT_MSG(x, msg)			\
 	do { (void)sizeof(x); } while(0)
 
-#define FLORAL_ASSERT_MSG_ONLY(x, msg)			\
+#	define FLORAL_ASSERT_MSG_ONLY(x, msg)		\
 	do { (void)sizeof(x); } while(0)
 #endif
 #else
-#define FLORAL_CRASH							\
-	{											\
-		volatile u32* crash = nullptr;			\
-		*crash = 10;							\
-	}
-
-#define FLORAL_ASSERT(x)						\
+#	define FLORAL_ASSERT(x)						\
 	do { (void)sizeof(x); } while(0)
 
-#define FLORAL_ASSERT_MSG(x, msg)				\
+#	define FLORAL_ASSERT_MSG(x, msg)			\
 	do { (void)sizeof(x); } while(0)
 
-#define FLORAL_ASSERT_MSG_ONLY(x, msg)			\
+#	define FLORAL_ASSERT_MSG_ONLY(x, msg)		\
 	do { (void)sizeof(x); } while(0)
 #endif
 // ----------------------------------------------------------------------------

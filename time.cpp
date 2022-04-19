@@ -1,12 +1,14 @@
 #include "time.h"
 
-#include <Windows.h>
+#if defined(FLORAL_PLATFORM_WINDOWS)
+#	include <Windows.h>
+#endif
 
 namespace floral
 {
 // ----------------------------------------------------------------------------
 
-#ifdef FLORAL_PLATFORM_WINDOWS
+#if defined(FLORAL_PLATFORM_WINDOWS)
 struct windows_time_t
 {
 	LARGE_INTEGER perfFreq;
@@ -23,7 +25,7 @@ static platform_time_t s_platformTime = initialize_time();
 
 // ----------------------------------------------------------------------------
 
-#ifdef FLORAL_PLATFORM_WINDOWS
+#if defined(FLORAL_PLATFORM_WINDOWS)
 platform_time_t initialize_time()
 {
 	platform_time_t platformTime;

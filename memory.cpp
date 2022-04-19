@@ -1,7 +1,9 @@
 #include "memory.h"
 
 #include "assert.h"
+#include "misc.h"
 
+#include <stdio.h>
 #include <string.h>
 
 #if defined(FLORAL_PLATFORM_WINDOWS)
@@ -13,16 +15,22 @@
 #elif defined(FLORAL_PLATFORM_LINUX)
 #endif
 
+// TODO: fix k_defaultSizeAligment for allocator
+
 namespace floral
 {
 // ----------------------------------------------------------------------------
 
-#define FILL_MEMORY 1
-//#define CHECK_ALIGNMENT(addr, alignment) FLORAL_ASSERT(addr & (alignment - 1) == 0)
+#define FILL_MEMORY 0
+#define CHECK_ALIGNMENT(addr, alignment) FLORAL_ASSERT(((aptr)addr & (alignment - 1)) == 0)
 
+// alignment of a memory allocation buffer (usually big, in KBytes)
+static constexpr size k_defaultSizeAligment = SIZE_KB(16); // use 16KB because allocation size for PS5 is a multiply of 16KB
+
+// alignment of a single allocated memory region in the allocator (usually small, in Bytes)
 static constexpr size k_defaultAlignment = 8;
 
-static voidptr internal_malloc(const size i_bytes)
+static voidptr internal_malloc(const size i_bytes, voidptr i_userData = nullptr)
 {
     voidptr addr = nullptr;
 #if defined(FLORAL_PLATFORM_WINDOWS)
@@ -33,7 +41,7 @@ static voidptr internal_malloc(const size i_bytes)
     return addr;
 }
 
-static void internal_free(voidptr i_data)
+static void internal_free(voidptr i_data, size i_bytes)
 {
 #if defined(FLORAL_PLATFORM_WINDOWS)
     VirtualFree((LPVOID)i_data, 0, MEM_RELEASE);
@@ -76,12 +84,12 @@ static void reset_block(alloc_header_t* i_block)
 
 // ----------------------------------------------------------------------------
 
-static allocator_t* create_allocator(const_cstr i_id, const size i_headerSize, const size i_bytes)
+static allocator_t* create_allocator(const_cstr i_id, const size i_headerSize, const size i_bytes, voidptr i_userData = nullptr)
 {
     const size headerSize = i_headerSize;
     const size headerSizeAligned = (size)align_aptr((aptr)headerSize, k_defaultAlignment);
-    const size realBytes = i_bytes + headerSizeAligned;
-    voidptr pMem = internal_malloc(realBytes);
+    const size realBytes = align_size(i_bytes + headerSizeAligned, k_defaultSizeAligment);
+    voidptr pMem = internal_malloc(realBytes, i_userData);
 
     allocator_t* allocator = (allocator_t*)pMem;
 
@@ -95,7 +103,7 @@ static allocator_t* create_allocator(const_cstr i_id, const size i_headerSize, c
     voidptr pAllocatorEndAligned = align_address(pAllocatorEnd, k_defaultAlignment);
 
     FLORAL_ASSERT((aptr)pAllocatorEndAligned == ((aptr)pMem + headerSizeAligned));
-    FLORAL_ASSERT((aptr)pMem + realBytes - (aptr)pAllocatorEndAligned == i_bytes);
+    FLORAL_ASSERT((aptr)pMem + realBytes - (aptr)pAllocatorEndAligned >= i_bytes);
 
     allocator->realAllocatedBytes = realBytes;
     allocator->baseAddress = pAllocatorEndAligned;
@@ -104,9 +112,37 @@ static allocator_t* create_allocator(const_cstr i_id, const size i_headerSize, c
     return allocator;
 }
 
-linear_allocator_t* create_linear_allocator(const_cstr i_id, const size i_bytes)
+static allocator_t* create_allocator(const_cstr i_id, voidptr i_buffer, const size i_headerSize, const size i_bytes, voidptr i_userData = nullptr)
 {
-    linear_allocator_t* allocator = (linear_allocator_t*)create_allocator(i_id, sizeof(linear_allocator_t), i_bytes);
+    const size headerSize = i_headerSize;
+    const size headerSizeAligned = (size)align_aptr((aptr)headerSize, k_defaultAlignment);
+    const size realBytes = align_size(i_bytes + headerSizeAligned, k_defaultSizeAligment);
+    voidptr pMem = i_buffer;
+
+    allocator_t* allocator = (allocator_t*)pMem;
+
+    fill_platform_info(&(allocator->platformInfo));
+    allocator->id[0] = i_id[0];
+    allocator->id[1] = i_id[1];
+    allocator->id[2] = i_id[2];
+    allocator->id[3] = i_id[3];
+
+    voidptr pAllocatorEnd = (voidptr)((aptr)pMem + headerSize);
+    voidptr pAllocatorEndAligned = align_address(pAllocatorEnd, k_defaultAlignment);
+
+    FLORAL_ASSERT((aptr)pAllocatorEndAligned == ((aptr)pMem + headerSizeAligned));
+    FLORAL_ASSERT((aptr)pMem + realBytes - (aptr)pAllocatorEndAligned >= i_bytes);
+
+    allocator->realAllocatedBytes = realBytes;
+    allocator->baseAddress = pAllocatorEndAligned;
+    allocator->capacity = i_bytes;
+
+    return allocator;
+}
+
+linear_allocator_t* create_linear_allocator(const_cstr i_id, const size i_bytes, voidptr i_userData /* = nullptr */)
+{
+    linear_allocator_t* allocator = (linear_allocator_t*)create_allocator(i_id, sizeof(linear_allocator_t), i_bytes, i_userData);
     reset_allocator(allocator);
     return allocator;
 }
@@ -114,6 +150,13 @@ linear_allocator_t* create_linear_allocator(const_cstr i_id, const size i_bytes)
 freelist_allocator_t* create_freelist_allocator(const_cstr i_id, const size i_bytes)
 {
     freelist_allocator_t* allocator = (freelist_allocator_t*)create_allocator(i_id, sizeof(freelist_allocator_t), i_bytes);
+    reset_allocator(allocator);
+    return allocator;
+}
+
+freelist_allocator_t* create_freelist_allocator(const_cstr i_id, voidptr i_buffer, const size i_bytes)
+{
+    freelist_allocator_t* allocator = (freelist_allocator_t*)create_allocator(i_id, i_buffer, sizeof(freelist_allocator_t), i_bytes);
     reset_allocator(allocator);
     return allocator;
 }
@@ -130,7 +173,7 @@ pool_allocator_t* create_pool_allocator(const_cstr i_id, const size i_slotSize, 
     const size headerSize = sizeof(alloc_header_t) + sizeof(voidptr); // the voidptr is the pointer to the header
     const size frameSlotSize = align_aptr(headerSize + i_alignment + i_slotSize, k_defaultAlignment);
     size bytes = frameSlotSize * i_slotCapacity;
-    size realBytes = allocatorHeaderSize + bytes;
+    size realBytes = align_size(allocatorHeaderSize + bytes, k_defaultSizeAligment);
 
     voidptr pMem = internal_malloc(realBytes);
     pool_allocator_t* allocator = (pool_allocator_t*)pMem;
@@ -192,7 +235,7 @@ pool_allocator_t* create_pool_allocator(const_cstr i_id, const size i_slotSize, 
 static void destroy_allocator(allocator_t* io_allocator)
 {
     voidptr addr = (voidptr)io_allocator;
-    internal_free(addr);
+    internal_free(addr, io_allocator->realAllocatedBytes);
 }
 
 // linear_allocator
@@ -210,7 +253,7 @@ voidptr reallocate(voidptr i_data, const size i_newBytes, linear_allocator_t* i_
 voidptr allocate(const size i_bytes, const size i_alignment, linear_allocator_t* i_allocator)
 {
     FLORAL_ASSERT(i_bytes > 0);
-    FLORAL_ASSERT(i_alignment >= k_defaultAlignment);
+    //FLORAL_ASSERT(i_alignment >= k_defaultAlignment);
     // the whole stack frame size, count all headers, displacement, data, ...
     // ....[A..A][H..H][ptrToHeader][D..D]
     // A: aligning-bytes (use k_defaultAlignment)
@@ -254,6 +297,7 @@ voidptr allocate(const size i_bytes, const size i_alignment, linear_allocator_t*
     i_allocator->currentMarker += frameSize;
 
     i_allocator->usedBytes += frameSize;
+    CHECK_ALIGNMENT(dataAddr, i_alignment);
     return (voidptr*)dataAddr;
 }
 
@@ -688,6 +732,18 @@ void free(voidptr i_data, pool_allocator_t* i_allocator)
 void destroy_allocator(pool_allocator_t* io_allocator)
 {
     destroy_allocator((allocator_t*)io_allocator);
+}
+
+const size get_allocated_size(voidptr i_data)
+{
+    if (i_data == nullptr)
+    {
+        return 0 ;
+    }
+
+    alloc_header_t** ppHeader = (alloc_header_t**)((aptr)i_data - sizeof(voidptr));
+    alloc_header_t* header = *ppHeader;
+    return header->frameSize;
 }
 
 // ----------------------------------------------------------------------------

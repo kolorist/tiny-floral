@@ -40,7 +40,7 @@ const size read_all_file(const_wcstr i_fileName, p8* o_buffer)
 const size read_all_file(const_cstr i_fileName, p8* o_buffer)
 {
 	FILE* f = nullptr;
-	fopen_s(&f, i_fileName, "rb");
+	f = fopen(i_fileName, "rb");
 	return read_all_file_internal(f, o_buffer);
 }
 

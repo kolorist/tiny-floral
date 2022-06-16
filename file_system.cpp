@@ -28,19 +28,18 @@ const size read_all_file_internal(FILE* f, p8* o_buffer)
 	return bufferLen;
 }
 
-const size read_all_file(const_wcstr i_fileName, p8* o_buffer)
+const size read_all_file(const_tcstr i_fileName, p8* o_buffer)
 {
 	FILE* f = nullptr;
 #if defined(FLORAL_PLATFORM_WINDOWS)
+#	if defined(UNICODE)
 	_wfopen_s(&f, i_fileName, TEXT("rb"));
-#endif
-	return read_all_file_internal(f, o_buffer);
-}
-
-const size read_all_file(const_cstr i_fileName, p8* o_buffer)
-{
-	FILE* f = nullptr;
+#	else
+	fopen_s(&f, i_fileName, "rb");
+#	endif
+#else
 	f = fopen(i_fileName, "rb");
+#endif
 	return read_all_file_internal(f, o_buffer);
 }
 

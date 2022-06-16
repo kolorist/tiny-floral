@@ -58,8 +58,16 @@ typedef size32									aptr;
 
 // c-string
 typedef char*                                   cstr;
+typedef wchar_t*								wcstr;
 typedef const char*                             const_cstr;
 typedef const wchar_t*							const_wcstr;
+#if defined(UNICODE)
+typedef wcstr									tcstr;
+typedef const_wcstr								const_tcstr;
+#else
+typedef cstr									tcstr;
+typedef const_cstr								const_tcstr;
+#endif
 
 // normal pointer
 typedef u8*										p8;

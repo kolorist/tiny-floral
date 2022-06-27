@@ -47,6 +47,13 @@ struct vec3f
 			f32 z;
 		};
 
+		struct
+		{
+			f32 r;
+			f32 g;
+			f32 b;
+		};
+
 		f32 elems[3];
 	};
 
@@ -75,6 +82,14 @@ struct vec4f
 			f32 y;
 			f32 z;
 			f32 w;
+		};
+
+		struct
+		{
+			f32 r;
+			f32 g;
+			f32 b;
+			f32 a;
 		};
 
 		f32 elems[4];

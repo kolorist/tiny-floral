@@ -8,22 +8,22 @@
 
 // integer
 typedef char									c8;
-typedef signed char                             s8;
-typedef unsigned char                           u8;
+typedef signed char								s8;
+typedef unsigned char							u8;
 
-typedef signed short int                        s16;
+typedef signed short int						s16;
 typedef unsigned short int						u16;
 
 typedef signed int								s32;
-typedef unsigned int                            u32;
+typedef unsigned int							u32;
 
-typedef signed long long int                    s64;
-typedef unsigned long long int                  u64;
+typedef signed long long int					s64;
+typedef unsigned long long int					u64;
 
 // floating point number
 typedef u16										f16;
-typedef float                                   f32;
-typedef double                                  f64;
+typedef float									f32;
+typedef double									f64;
 
 // size type
 typedef u32										size32;
@@ -57,9 +57,9 @@ typedef size32									aptr;
 #endif
 
 // c-string
-typedef char*                                   cstr;
+typedef char*									cstr;
 typedef wchar_t*								wcstr;
-typedef const char*                             const_cstr;
+typedef const char*								const_cstr;
 typedef const wchar_t*							const_wcstr;
 #if defined(UNICODE)
 typedef wcstr									tcstr;
@@ -76,4 +76,4 @@ typedef u32*									p32;
 typedef u64*									p64;
 
 // void pointer
-typedef void*                                   voidptr;
+typedef void*									voidptr;

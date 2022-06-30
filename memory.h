@@ -113,6 +113,7 @@ struct linear_allocator_i
     voidptr reallocate(voidptr i_data, const size i_newBytes, const size i_alignment);
 
     void free(voidptr i_data);
+	void reset();
 
     linear_allocator_t* allocator;
 };

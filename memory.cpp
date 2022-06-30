@@ -799,6 +799,11 @@ void linear_allocator_i::free(voidptr i_data)
     floral::free(i_data, allocator);
 }
 
+void linear_allocator_i::reset()
+{
+	floral::reset_allocator(allocator);
+}
+
 freelist_allocator_i::freelist_allocator_i()
     : allocator(nullptr)
     , allocCount(0)

@@ -5,6 +5,7 @@
 #if defined(FLORAL_PLATFORM_WINDOWS)
 #include <Windows.h>
 #elif defined(FLORAL_PLATFORM_LINUX)
+#include <pthread.h>
 #else
 // TODO
 #endif
@@ -22,8 +23,8 @@ struct thread_platform_data_t
 #elif defined(FLORAL_PLATFORM_LINUX)
 struct thread_platform_data_t
 {
+	pthread_t handle;
 };
-
 #else
 // TODO
 #endif
@@ -69,6 +70,7 @@ struct cv_platform_data_t
 #elif defined(FLORAL_PLATFORM_LINUX)
 struct mutex_platform_data_t
 {
+	pthread_mutex_t handle;
 };
 struct cv_platform_data_t
 {

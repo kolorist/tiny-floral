@@ -15,57 +15,57 @@ namespace floral
 
 struct platform_info_t
 {
-    size pageSize;
+	size pageSize;
 };
 
 struct allocator_t
 {
-    platform_info_t platformInfo;
+	platform_info_t platformInfo;
 
-    c8 id[4];
-    size realAllocatedBytes;
-    voidptr baseAddress;
-    size capacity;
+	c8 id[4];
+	size realAllocatedBytes;
+	voidptr baseAddress;
+	size capacity;
 };
 
 struct alloc_header_t
 {
-    alloc_header_t* prevAlloc;
-    alloc_header_t* nextAlloc;
-    p8 marker;
-    size frameSize;
+	alloc_header_t* prevAlloc;
+	alloc_header_t* nextAlloc;
+	p8 marker;
+	size frameSize;
 
-    size alignment;
-    size dataSize;
+	size alignment;
+	size dataSize;
 };
 
 struct linear_allocator_t : public allocator_t
 {
-    p8 currentMarker;
-    alloc_header_t* lastAlloc;
+	p8 currentMarker;
+	alloc_header_t* lastAlloc;
 
-    size usedBytes;
+	size usedBytes;
 };
 
 struct freelist_allocator_t : public allocator_t
 {
-    alloc_header_t* firstFreeBlock;
+	alloc_header_t* firstFreeBlock;
 
-    alloc_header_t* lastAlloc;
-    size usedBytes;
+	alloc_header_t* lastAlloc;
+	size usedBytes;
 };
 
 struct pool_allocator_t : public allocator_t
 {
-    alloc_header_t* firstFreeBlock;
+	alloc_header_t* firstFreeBlock;
 
-    alloc_header_t* lastAlloc;
-    size usedBytes;
+	alloc_header_t* lastAlloc;
+	size usedBytes;
 
-    size slotSize;
-    size alignment;
-    size slotCapacity;
-    size usedSlot;
+	size slotSize;
+	size alignment;
+	size slotCapacity;
+	size usedSlot;
 };
 
 // ----------------------------------------------------------------------------
@@ -101,41 +101,41 @@ const size get_allocated_size(voidptr i_data);
 // helpers
 struct linear_allocator_i
 {
-    linear_allocator_i();
-    ~linear_allocator_i();
+	linear_allocator_i();
+	~linear_allocator_i();
 
-    void initialize(const_cstr i_id, const size i_bytes);
-    void destroy();
+	void initialize(const_cstr i_id, const size i_bytes);
+	void destroy();
 
-    voidptr allocate(const size i_bytes);
-    voidptr allocate(const size i_bytes, const size i_alignment);
-    voidptr reallocate(voidptr i_data, const size i_newBytes);
-    voidptr reallocate(voidptr i_data, const size i_newBytes, const size i_alignment);
+	voidptr allocate(const size i_bytes);
+	voidptr allocate(const size i_bytes, const size i_alignment);
+	voidptr reallocate(voidptr i_data, const size i_newBytes);
+	voidptr reallocate(voidptr i_data, const size i_newBytes, const size i_alignment);
 
-    void free(voidptr i_data);
+	void free(voidptr i_data);
 	void reset();
 
-    linear_allocator_t* allocator;
+	linear_allocator_t* allocator;
 };
 
 struct freelist_allocator_i
 {
-    freelist_allocator_i();
-    ~freelist_allocator_i();
+	freelist_allocator_i();
+	~freelist_allocator_i();
 
-    void initialize(const_cstr i_id, const size i_bytes);
-    void destroy();
+	void initialize(const_cstr i_id, const size i_bytes);
+	void destroy();
 
-    voidptr allocate(const size i_bytes);
-    voidptr allocate(const size i_bytes, const size i_alignment);
-    voidptr reallocate(voidptr i_data, const size i_newBytes);
-    voidptr reallocate(voidptr i_data, const size i_newBytes, const size i_alignment);
+	voidptr allocate(const size i_bytes);
+	voidptr allocate(const size i_bytes, const size i_alignment);
+	voidptr reallocate(voidptr i_data, const size i_newBytes);
+	voidptr reallocate(voidptr i_data, const size i_newBytes, const size i_alignment);
 
-    void free(voidptr i_data);
+	void free(voidptr i_data);
 
-    freelist_allocator_t* allocator;
-    u64 allocCount;
-    u64 freeCount;
+	freelist_allocator_t* allocator;
+	u64 allocCount;
+	u64 freeCount;
 };
 
 // ----------------------------------------------------------------------------

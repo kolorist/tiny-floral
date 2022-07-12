@@ -17,8 +17,8 @@ namespace floral
 #if defined(FLORAL_PLATFORM_WINDOWS)
 struct thread_platform_data_t
 {
-    DWORD id;
-    HANDLE handle;
+	DWORD id;
+	HANDLE handle;
 };
 #elif defined(FLORAL_PLATFORM_LINUX)
 struct thread_platform_data_t
@@ -33,15 +33,15 @@ typedef void (*thread_func_t)(voidptr i_data, voidptr i_allocator);
 
 struct thread_desc_t
 {
-    voidptr allocator;
-    voidptr data;
-    thread_func_t func;
+	voidptr allocator;
+	voidptr data;
+	thread_func_t func;
 };
 
 struct thread_t
 {
-    thread_platform_data_t platformData;
-    thread_desc_t desc;
+	thread_platform_data_t platformData;
+	thread_desc_t desc;
 };
 
 // ----------------------------------------------------------------------------
@@ -58,14 +58,14 @@ void join_thread(thread_t* const io_thread);
 #if defined(FLORAL_PLATFORM_WINDOWS)
 struct mutex_platform_data_t
 {
-    CRITICAL_SECTION handle;
+	CRITICAL_SECTION handle;
 };
 
 struct cv_platform_data_t
 {
-    HANDLE notifyEvents[2];
-    u32 waitersCount;
-    CRITICAL_SECTION waitersCountLock;
+	HANDLE notifyEvents[2];
+	u32 waitersCount;
+	CRITICAL_SECTION waitersCountLock;
 };
 #elif defined(FLORAL_PLATFORM_LINUX)
 struct mutex_platform_data_t
@@ -74,6 +74,7 @@ struct mutex_platform_data_t
 };
 struct cv_platform_data_t
 {
+	pthread_cond_t handle;
 };
 #else
 // TODO
@@ -81,20 +82,20 @@ struct cv_platform_data_t
 
 struct mutex_t
 {
-    mutex_platform_data_t platformData;
+	mutex_platform_data_t platformData;
 };
 
 struct condition_variable_t
 {
-    cv_platform_data_t platformData;
+	cv_platform_data_t platformData;
 };
 
 struct lock_guard_t
 {
-    lock_guard_t(mutex_t* const i_mtx);
-    ~lock_guard_t();
+	lock_guard_t(mutex_t* const i_mtx);
+	~lock_guard_t();
 
-    mutex_t* const mtx;
+	mutex_t* const mtx;
 };
 
 // ----------------------------------------------------------------------------

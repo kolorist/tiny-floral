@@ -13,6 +13,7 @@
 #   elif defined(FLORAL_PLATFORM_XBOX_ONE)
 #   endif
 #elif defined(FLORAL_PLATFORM_LINUX)
+#	include <stdlib.h>
 #endif
 
 // TODO: fix k_defaultSizeAligment for allocator
@@ -35,6 +36,8 @@ static voidptr internal_malloc(const size i_bytes, voidptr i_userData = nullptr)
     voidptr addr = nullptr;
 #if defined(FLORAL_PLATFORM_WINDOWS)
     addr = (voidptr)VirtualAlloc(nullptr, i_bytes, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+#elif defined(FLORAL_PLATFORM_LINUX)
+	addr = ::malloc(i_bytes);
 #elif defined(FLORAL_PLATFORM_XBOX_SCARLETT)
     addr = (voidptr)XMemVirtualAlloc(nullptr, i_bytes, MEM_COMMIT | MEM_RESERVE | MEM_64K_PAGES, XMEM_CPU, PAGE_READWRITE);
 #endif
@@ -45,6 +48,8 @@ static void internal_free(voidptr i_data, size i_bytes)
 {
 #if defined(FLORAL_PLATFORM_WINDOWS)
     VirtualFree((LPVOID)i_data, 0, MEM_RELEASE);
+#elif defined(FLORAL_PLATFORM_LINUX)
+	::free(i_data);
 #elif defined(FLORAL_PLATFORM_XBOX_SCARLETT)
     VirtualFree((LPVOID)i_data, 0, MEM_RELEASE);
 #endif

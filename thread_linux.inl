@@ -73,23 +73,28 @@ void unlock_mutex(mutex_t* const i_mtx)
 condition_variable_t create_condition_variable()
 {
 	condition_variable_t newCv;
+	pthread_cond_init(&newCv.platformData.handle, nullptr);
 	return newCv;
 }
 
 void destroy_condition_variable(condition_variable_t* const i_cv)
 {
+	pthread_cond_destroy(&i_cv->platformData.handle);
 }
 
 void wait_for_condition(condition_variable_t* const i_cv, mutex_t* const i_mtx)
 {
+	pthread_cond_wait(&i_cv->platformData.handle, &i_mtx->platformData.handle);
 }
 
 void notify_one(condition_variable_t* const i_cv)
 {
+	pthread_cond_signal(&i_cv->platformData.handle);
 }
 
 void notify_all(condition_variable_t* const i_cv)
 {
+	pthread_cond_broadcast(&i_cv->platformData.handle);
 }
 
 lock_guard_t::lock_guard_t(mutex_t* const i_mtx)

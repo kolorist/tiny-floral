@@ -32,11 +32,17 @@ struct thread_logger_t
 };
 
 thread_local thread_logger_t tl_threadLogger;
+thread_local u64 tl_frameIndex = 0;
 
 void initialize_logger(const_cstr i_name)
 {
 	strcpy(tl_threadLogger.name, i_name);
 	tl_threadLogger.initialized = true;
+}
+
+void tick_logger()
+{
+	tl_frameIndex++;
 }
 
 void logf(log_level_e i_logLevel, const_cstr i_fmt, ...)
@@ -52,34 +58,36 @@ void logf(log_level_e i_logLevel, const_cstr i_fmt, ...)
 	android_LogPriority prio = ANDROID_LOG_DEBUG;
 #endif
 
+	u32 fidx = tl_frameIndex % 1000;
+
 	switch (i_logLevel)
 	{
 		case log_level_e::verbose:
-			p = snprintf(&str[0], rLen, "[%s] [verbose] ", tl_threadLogger.name);
+			p = snprintf(&str[0], rLen, "[%s] [%3d] [verbose] ", tl_threadLogger.name, fidx);
 #if defined(FLORAL_PLATFORM_ANDROID)
 			prio = ANDROID_LOG_VERBOSE;
 #endif
 			break;
 		case log_level_e::debug:
-			p = snprintf(&str[0], rLen, "[%s] [debug] ", tl_threadLogger.name);
+			p = snprintf(&str[0], rLen, "[%s] [%3d] [debug] ", tl_threadLogger.name, fidx);
 #if defined(FLORAL_PLATFORM_ANDROID)
 			prio = ANDROID_LOG_DEBUG;
 #endif
 			break;
 		case log_level_e::info:
-			p = snprintf(&str[0], rLen, "[%s] [info] ", tl_threadLogger.name);
+			p = snprintf(&str[0], rLen, "[%s] [%3d] [info] ", tl_threadLogger.name, fidx);
 #if defined(FLORAL_PLATFORM_ANDROID)
 			prio = ANDROID_LOG_INFO;
 #endif
 			break;
 		case log_level_e::warning:
-			p = snprintf(&str[0], rLen, "[%s] [warning] ", tl_threadLogger.name);
+			p = snprintf(&str[0], rLen, "[%s] [%3d] [warning] ", tl_threadLogger.name, fidx);
 #if defined(FLORAL_PLATFORM_ANDROID)
 			prio = ANDROID_LOG_WARN;
 #endif
 			break;
 		case log_level_e::error:
-			p = snprintf(&str[0], rLen, "[%s] [error] ", tl_threadLogger.name);
+			p = snprintf(&str[0], rLen, "[%s] [%3d] [error] ", tl_threadLogger.name, fidx);
 #if defined(FLORAL_PLATFORM_ANDROID)
 			prio = ANDROID_LOG_ERROR;
 #endif

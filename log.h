@@ -15,6 +15,7 @@ enum class log_level_e : u8
 };
 
 void initialize_logger(const_cstr i_name);
+void tick_logger();
 void logf(log_level_e i_logLevel, const_cstr i_fmt, ...);
 
 // ----------------------------------------------------------------------------

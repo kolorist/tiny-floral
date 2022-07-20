@@ -4,7 +4,7 @@ namespace floral
 {
 // ----------------------------------------------------------------------------
 // ref: https://stackoverflow.com/questions/4062126/can-2-pthread-condition-variables-share-the-same-mutex
-command_buffer_mt_t create_command_buffer(voidptr i_memory, size i_size)
+command_buffer_mt_t create_command_buffer_mt(voidptr i_memory, size i_size)
 {
     command_buffer_mt_t newCmdBuff;
     newCmdBuff.bufferSize = i_size / 2;
@@ -21,6 +21,17 @@ command_buffer_mt_t create_command_buffer(voidptr i_memory, size i_size)
     newCmdBuff.backCv = create_condition_variable();
 
     return newCmdBuff;
+}
+
+command_buffer_t create_command_buffer(voidptr i_memory, size i_size)
+{
+	command_buffer_t newCmdBuff;
+	newCmdBuff.bufferSize = i_size;
+	newCmdBuff.cmdData = (p8)i_memory;
+	newCmdBuff.writePtr = (p8)i_memory;
+	newCmdBuff.readPtr = (p8)i_memory;
+
+	return newCmdBuff;
 }
 
 void submit_buffer(command_buffer_mt_t* const i_cmdBuff)
@@ -60,6 +71,12 @@ void end_buffer(command_buffer_mt_t* const i_cmdBuff)
 
     floral::notify_one(&i_cmdBuff->backCv); // notify that the front buffer was processed
     floral::unlock_mutex(&i_cmdBuff->mtx);
+}
+
+void reset_buffer(command_buffer_t* const io_cmdBuff)
+{
+	io_cmdBuff->writePtr = io_cmdBuff->cmdData;
+	io_cmdBuff->readPtr = io_cmdBuff->cmdData;
 }
 
 // ----------------------------------------------------------------------------

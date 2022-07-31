@@ -4,15 +4,16 @@
 #include "stdaliases.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 namespace floral
 {
 // ----------------------------------------------------------------------------
 enum class assert_action_e
 {
-    abort = 0,
-    debug_break,
-    ignore
+	abort = 0,
+	debug_break,
+	ignore
 };
 
 assert_action_e assertion_report(const_cstr expr, const_cstr file, const u32 line);
@@ -27,13 +28,13 @@ assert_action_e assertion_report_dlg(const_cstr title, const_cstr msg, const_cst
 }
 
 #if defined(FLORAL_PLATFORM_WINDOWS)
-#	define FLORAL_DEBUG_BREAK						__debugbreak
+#	define FLORAL_DEBUG_BREAK					__debugbreak
 #else
-// TODO
+#	define FLORAL_DEBUG_BREAK					__builtin_trap
 #endif
 
 #if !defined(NDEBUG)
-#if defined(FLORAL_PLATFORM_WINDOWS)
+#if defined(FLORAL_PLATFORM_WINDOWS) || defined(FLORAL_PLATFORM_ANDROID)
 #	define FLORAL_ASSERT(x)						\
 	do {										\
 		if (!(x)) {								\
@@ -94,7 +95,7 @@ assert_action_e assertion_report_dlg(const_cstr title, const_cstr msg, const_cst
 #	define FLORAL_ASSERT_MSG_ONLY(x, msg)		\
 	do { (void)sizeof(x); } while(0)
 #endif
-#else
+#else // NDEBUG
 #	define FLORAL_ASSERT(x)						\
 	do { (void)sizeof(x); } while(0)
 

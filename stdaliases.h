@@ -62,9 +62,11 @@ typedef wchar_t*								wcstr;
 typedef const char*								const_cstr;
 typedef const wchar_t*							const_wcstr;
 #if defined(UNICODE)
+typedef wchar_t									tchar;
 typedef wcstr									tcstr;
 typedef const_wcstr								const_tcstr;
 #else
+typedef char									tchar;
 typedef cstr									tcstr;
 typedef const_cstr								const_tcstr;
 #endif

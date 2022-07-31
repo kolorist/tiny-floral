@@ -5,10 +5,16 @@
 #elif defined(FLORAL_PLATFORM_LINUX)
 #endif
 #include <stdio.h>
+#include <string.h>
 
 namespace floral
 {
 // ----------------------------------------------------------------------------
+static tchar s_workingDir[256];
+void set_working_directory(const_tcstr i_workingDir)
+{
+	strcpy(s_workingDir, i_workingDir);
+}
 
 const size read_all_file_internal(FILE* f, p8* o_buffer)
 {
@@ -38,7 +44,9 @@ const size read_all_file(const_tcstr i_fileName, p8* o_buffer)
 	fopen_s(&f, i_fileName, "rb");
 #	endif
 #else
-	f = fopen(i_fileName, "rb");
+	tchar filePath[256];
+	sprintf(filePath, "%s/%s", s_workingDir, i_fileName);
+	f = fopen(filePath, "rb");
 #endif
 	return read_all_file_internal(f, o_buffer);
 }

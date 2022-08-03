@@ -11,10 +11,10 @@ namespace floral
 template <typename t_value>
 struct array_t
 {
-    ssize size;
-    ssize capacity;
+	ssize size;
+	ssize capacity;
 
-    t_value* data;
+	t_value* data;
 };
 
 template <typename t_value>
@@ -30,18 +30,18 @@ void array_empty(array_t<t_value>* const i_arr);
 
 struct command_buffer_mt_t
 {
-    size bufferSize;
-    p8 cmdData[2];
+	size bufferSize;
+	p8 cmdData[2];
 
-    // multithread control
-    uidx backBufferIdx;
-    p8 writePtr;
-    p8 readPtr;
+	// multithread control
+	uidx backBufferIdx;
+	p8 writePtr;
+	p8 readPtr;
 
-    p8 frontBuffer;
-    floral::mutex_t mtx;
-    floral::condition_variable_t frontCv;
-    floral::condition_variable_t backCv;
+	p8 frontBuffer;
+	floral::mutex_t mtx;
+	floral::condition_variable_t frontCv;
+	floral::condition_variable_t backCv;
 };
 
 struct command_buffer_t
@@ -56,6 +56,7 @@ struct command_buffer_t
 // ----------------------------------------------------------------------------
 
 command_buffer_mt_t create_command_buffer_mt(voidptr i_memory, size i_size);
+void create_command_buffer(voidptr i_memory, size i_size, command_buffer_t* io_cmdBuff);
 command_buffer_t create_command_buffer(voidptr i_memory, size i_size);
 void submit_buffer(command_buffer_mt_t* const i_cmdBuff);
 void begin_buffer(command_buffer_mt_t* const i_cmdBuff);
@@ -68,16 +69,32 @@ template <typename t_commandBuffer, typename t_value>
 void cmdbuff_write(t_commandBuffer* const io_cmdBuff, const t_value& i_value);
 
 // ----------------------------------------------------------------------------
+template<typename t_item>
+struct circular_queue_mt_t
+{
+	t_item* data;
+	size head;
+	size tail;
+	size capacity;
+
+	floral::mutex_t mtx;
+	floral::condition_variable_t cv;
+};
+
+template<typename t_item>
+circular_queue_mt_t<t_item> create_circular_queue_mt(voidptr i_memory, const size i_capacity);
+
+template<typename t_item>
+void enqueue(circular_queue_mt_t<t_item>* i_queue, t_item& i_item);
+
+template<typename t_item>
+t_item dequeue_block(circular_queue_mt_t<t_item>* i_queue);
+
 #if 0
 template<typename t_item>
 struct circular_queue_st_t
 {
 
-};
-
-template<typename t_item>
-struct circular_queue_mt_t
-{
 };
 
 template<typename t_item>

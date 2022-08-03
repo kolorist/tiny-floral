@@ -14,6 +14,7 @@
 
 #include "assert.h"
 #include "thread.h"
+#include "time.h"
 
 namespace floral
 {
@@ -59,35 +60,36 @@ void logf(log_level_e i_logLevel, const_cstr i_fmt, ...)
 #endif
 
 	u32 fidx = tl_frameIndex % 1000;
+	f32 ts = get_time_absolute();
 
 	switch (i_logLevel)
 	{
 		case log_level_e::verbose:
-			p = snprintf(&str[0], rLen, "[%s] [%3d] [verbose] ", tl_threadLogger.name, fidx);
+			p = snprintf(&str[0], rLen, "[%4.2f] [%s] [%3d] [verbose] ", ts, tl_threadLogger.name, fidx);
 #if defined(FLORAL_PLATFORM_ANDROID)
 			prio = ANDROID_LOG_VERBOSE;
 #endif
 			break;
 		case log_level_e::debug:
-			p = snprintf(&str[0], rLen, "[%s] [%3d] [debug] ", tl_threadLogger.name, fidx);
+			p = snprintf(&str[0], rLen, "[%4.2f] [%s] [%3d] [debug] ", ts, tl_threadLogger.name, fidx);
 #if defined(FLORAL_PLATFORM_ANDROID)
 			prio = ANDROID_LOG_DEBUG;
 #endif
 			break;
 		case log_level_e::info:
-			p = snprintf(&str[0], rLen, "[%s] [%3d] [info] ", tl_threadLogger.name, fidx);
+			p = snprintf(&str[0], rLen, "[%4.2f] [%s] [%3d] [info] ", ts, tl_threadLogger.name, fidx);
 #if defined(FLORAL_PLATFORM_ANDROID)
 			prio = ANDROID_LOG_INFO;
 #endif
 			break;
 		case log_level_e::warning:
-			p = snprintf(&str[0], rLen, "[%s] [%3d] [warning] ", tl_threadLogger.name, fidx);
+			p = snprintf(&str[0], rLen, "[%4.2f] [%s] [%3d] [warning] ", ts, tl_threadLogger.name, fidx);
 #if defined(FLORAL_PLATFORM_ANDROID)
 			prio = ANDROID_LOG_WARN;
 #endif
 			break;
 		case log_level_e::error:
-			p = snprintf(&str[0], rLen, "[%s] [%3d] [error] ", tl_threadLogger.name, fidx);
+			p = snprintf(&str[0], rLen, "[%4.2f] [%s] [%3d] [error] ", ts, tl_threadLogger.name, fidx);
 #if defined(FLORAL_PLATFORM_ANDROID)
 			prio = ANDROID_LOG_ERROR;
 #endif

@@ -7,7 +7,7 @@ namespace floral
 static DWORD WINAPI thread_func(LPVOID i_param)
 {
 	thread_desc_t* desc = (thread_desc_t*)i_param;
-	(*(desc->func))(desc->data, desc->allocator);
+	(*(desc->func))(desc->data);
 	return 0;
 }
 

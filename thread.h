@@ -29,11 +29,10 @@ struct thread_platform_data_t
 // TODO
 #endif
 
-typedef void (*thread_func_t)(voidptr i_data, voidptr i_allocator);
+typedef void (*thread_func_t)(voidptr i_data);
 
 struct thread_desc_t
 {
-	voidptr allocator;
 	voidptr data;
 	thread_func_t func;
 };

@@ -83,5 +83,13 @@ void reset_buffer(command_buffer_t* const io_cmdBuff)
 	io_cmdBuff->readPtr = io_cmdBuff->cmdData;
 }
 
+void copy_buffer(command_buffer_t* o_to, const command_buffer_t* i_from)
+{
+	FLORAL_ASSERT(o_to->bufferSize >= i_from->bufferSize);
+	size cmdSize = (aptr)i_from->writePtr - (aptr)i_from->cmdData;
+	memcpy(o_to->cmdData, i_from->cmdData, cmdSize);
+	o_to->writePtr = o_to->cmdData + cmdSize;
+}
+
 // ----------------------------------------------------------------------------
 }

@@ -30,11 +30,18 @@ void array_empty(array_t<t_value>* const i_arr)
 // ----------------------------------------------------------------------------
 
 template <typename t_commandBuffer, typename t_value>
-void cmdbuff_read(t_commandBuffer* const i_cmdBuff, t_value* o_value)
+const bool cmdbuff_read(t_commandBuffer* const i_cmdBuff, t_value* o_value)
 {
+	if (i_cmdBuff->readPtr == i_cmdBuff->writePtr)
+	{
+		return false;
+	}
+
 	p8 rpos = i_cmdBuff->readPtr;
 	memcpy(o_value, rpos, sizeof(t_value));
 	i_cmdBuff->readPtr = rpos + sizeof(t_value);
+
+	return true;
 }
 
 template <typename t_commandBuffer, typename t_value>

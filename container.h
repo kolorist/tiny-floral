@@ -64,7 +64,7 @@ void end_buffer(command_buffer_mt_t* const i_cmdBuff);
 void reset_buffer(command_buffer_t* const io_cmdBuff);
 
 template <typename t_commandBuffer, typename t_value>
-void cmdbuff_read(t_commandBuffer* const i_cmdBuff, t_value* o_value);
+const bool cmdbuff_read(t_commandBuffer* const i_cmdBuff, t_value* o_value);
 template <typename t_commandBuffer, typename t_value>
 void cmdbuff_write(t_commandBuffer* const io_cmdBuff, const t_value& i_value);
 

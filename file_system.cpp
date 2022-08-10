@@ -16,7 +16,7 @@ void set_working_directory(const_tcstr i_workingDir)
 	strcpy(s_workingDir, i_workingDir);
 }
 
-const size read_all_file_internal(FILE* f, p8* o_buffer)
+const size read_all_file_internal(FILE* f, p8 o_buffer)
 {
 	size bufferLen = 0;
 	if (f != nullptr)
@@ -24,17 +24,19 @@ const size read_all_file_internal(FILE* f, p8* o_buffer)
 		fseek(f, 0, SEEK_END);
 		bufferLen = ftell(f);
 
-		// TODO: remove new
-        *o_buffer = new u8[bufferLen];
+		if (o_buffer == nullptr)
+		{
+			return bufferLen;
+		}
 
 		fseek(f, 0, SEEK_SET);
-		fread(*o_buffer, bufferLen, 1, f);
+		fread(o_buffer, bufferLen, 1, f);
 		fclose(f);
 	}
 	return bufferLen;
 }
 
-const size read_all_file(const_tcstr i_fileName, p8* o_buffer)
+const size read_all_file(const_tcstr i_fileName, p8 o_buffer)
 {
 	FILE* f = nullptr;
 #if defined(FLORAL_PLATFORM_WINDOWS)

@@ -3,9 +3,26 @@
 #include "configs.h"
 #include "stdaliases.h"
 
+#if defined(FLORAL_PLATFORM_WINDOWS)
+#	include <Windows.h>
+#elif defined(FLORAL_PLATFORM_ANDROID)
+#	include <android/native_window.h>
+#endif
+
 namespace floral
 {
 // ----------------------------------------------------------------------------
+
+struct native_surface_t
+{
+#if defined(FLORAL_PLATFORM_WINDOWS)
+	HINSTANCE									hInst;
+	HWND										hwnd;
+#elif defined(FLORAL_PLATFORM_ANDROID)
+	ANativeWindow*								wnd;
+#endif
+};
+
 constexpr f32 pi = 3.1415926525898f;
 constexpr f32 half_pi = 1.5707963267948966f;
 

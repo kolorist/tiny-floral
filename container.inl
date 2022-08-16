@@ -99,4 +99,71 @@ t_item dequeue_block(circular_queue_mt_t<t_item>* i_queue)
 	return item;
 }
 
+// ----------------------------------------------------------------------------
+
+template <typename t_handle_type>
+handle_pool_t<t_handle_type> create_handle_pool(voidptr i_memory, const size i_memSize)
+{
+	size capacity = (i_memSize >> 1) / sizeof(t_handle_type);
+
+	handle_pool_t<t_handle_type> newPool;
+	newPool.dense = (ssize*)i_memory;
+	newPool.sparse = (ssize*)((aptr)i_memory + capacity * sizeof(ssize));
+	newPool.capacity = capacity;
+	newPool.count = 0;
+
+	for (size i = 0; i < capacity; i++)
+	{
+		newPool.dense[i] = i;
+	}
+
+	return newPool;
+}
+
+template <typename t_handle_type>
+t_handle_type get_new_handle(handle_pool_t<t_handle_type>* i_handlePool)
+{
+	if (i_handlePool->count < i_handlePool->capacity)
+	{
+		size index = i_handlePool->count;
+		i_handlePool->count++;
+
+		// new handle value is always located at the end of dense array
+		ssize handle = i_handlePool->dense[index];
+
+		// till now, we have dense[index] == handle
+		// keep the relationship: sparse[handle] == index and dense[index] == handle
+		i_handlePool->sparse[handle] = index;
+
+		return (t_handle_type)handle;
+	}
+	else
+	{
+		return t_handle_type(-1);
+	}
+}
+
+template <typename t_handle_type>
+void destroy_handle(handle_pool_t<t_handle_type>* i_handlePool, const t_handle_type i_handle)
+{
+	ssize index = i_handlePool->sparse[(size)i_handle];
+	ssize lastDenseIndex = i_handlePool->count - 1;
+
+	// move the freed handle value to the last of dense array, it will be reused in the next get_new_handle call
+	// also redirect the index of the last allocated handle into the freed handle's slot.
+	ssize tmpHandle = i_handlePool->dense[lastDenseIndex];
+	i_handlePool->dense[lastDenseIndex] = (size)i_handle;
+	i_handlePool->sparse[tmpHandle] = index;
+	i_handlePool->dense[index] = tmpHandle; // keep the relationship: sparse[handle] == index and dense[index] == handle
+
+	i_handlePool->count--;
+}
+
+template <typename t_handle_type>
+const bool is_handle_valid(handle_pool_t<t_handle_type>* i_handlePool, const t_handle_type i_handle)
+{
+	ssize index = i_handlePool->sparse[(size)i_handle];
+	return index < i_handlePool->count && i_handlePool->dense[index] == (size)i_handle;
+}
+
 }

@@ -70,6 +70,7 @@ template <typename t_commandBuffer, typename t_value>
 void cmdbuff_write(t_commandBuffer* const io_cmdBuff, const t_value& i_value);
 
 // ----------------------------------------------------------------------------
+
 template<typename t_item>
 struct circular_queue_mt_t
 {
@@ -90,6 +91,30 @@ void enqueue(circular_queue_mt_t<t_item>* i_queue, t_item& i_item);
 
 template<typename t_item>
 t_item dequeue_block(circular_queue_mt_t<t_item>* i_queue);
+
+// ----------------------------------------------------------------------------
+
+template <typename t_handle_type>
+struct handle_pool_t
+{
+	t_handle_type* dense;
+	t_handle_type* sparse;
+
+	size capacity;
+	size count;
+};
+
+template <typename t_handle_type>
+handle_pool_t<t_handle_type> create_handle_pool(voidptr i_memory, const size i_memSize);
+
+template <typename t_handle_type>
+t_handle_type get_new_handle(handle_pool_t<t_handle_type>* i_handlePool);
+
+template <typename t_handle_type>
+void destroy_handle(handle_pool_t<t_handle_type>* i_handlePool, const t_handle_type i_handle);
+
+template <typename t_handle_type>
+const bool is_handle_valid(handle_pool_t<t_handle_type>* i_handlePool, const t_handle_type i_handle);
 
 #if 0
 template<typename t_item>

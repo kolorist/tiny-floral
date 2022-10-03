@@ -46,7 +46,7 @@ void wait_for_package_consumed(frame_package_t* i_package)
 
 thread_syncpoint_t create_syncpoint()
 {
-	thread_syncpoint_t newSp;
+	thread_syncpoint_t newSp = {};
 
 	newSp.signaled = false;
 	newSp.mtx = floral::create_mutex();

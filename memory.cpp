@@ -317,7 +317,7 @@ voidptr reallocate(voidptr i_data, const size i_newBytes, const size i_alignment
 	alloc_header_t* header = *ppHeader;
 
 	voidptr newData = allocate(i_newBytes, i_alignment, i_allocator);
-	memcpy(newData, i_data, header->dataSize);
+	memcpy(newData, i_data, min(i_newBytes, header->dataSize));
 	return newData;
 }
 

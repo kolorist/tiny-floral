@@ -16,8 +16,6 @@
 #	include <stdlib.h>
 #endif
 
-// TODO: fix k_defaultSizeAligment for allocator
-
 namespace floral
 {
 // ----------------------------------------------------------------------------
@@ -40,7 +38,7 @@ static voidptr internal_malloc(const size i_bytes, voidptr i_userData = nullptr)
 	voidptr addr = nullptr;
 #if defined(FLORAL_PLATFORM_WINDOWS)
 	addr = (voidptr)VirtualAlloc(nullptr, i_bytes, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-#elif defined(FLORAL_PLATFORM_LINUX)
+#elif defined(FLORAL_PLATFORM_ANDROID)
 	addr = ::malloc(i_bytes);
 #elif defined(FLORAL_PLATFORM_XBOX_SCARLETT)
 	addr = (voidptr)XMemVirtualAlloc(nullptr, i_bytes, MEM_COMMIT | MEM_RESERVE | MEM_64K_PAGES, XMEM_CPU, PAGE_READWRITE);
@@ -52,7 +50,7 @@ static void internal_free(voidptr i_data, size i_bytes)
 {
 #if defined(FLORAL_PLATFORM_WINDOWS)
 	VirtualFree((LPVOID)i_data, 0, MEM_RELEASE);
-#elif defined(FLORAL_PLATFORM_LINUX)
+#elif defined(FLORAL_PLATFORM_ANDROID)
 	::free(i_data);
 #elif defined(FLORAL_PLATFORM_XBOX_SCARLETT)
 	VirtualFree((LPVOID)i_data, 0, MEM_RELEASE);
@@ -96,7 +94,7 @@ static void reset_block(alloc_header_t* i_block)
 static allocator_t* create_allocator(const_cstr i_id, const size i_headerSize, const size i_bytes, voidptr i_userData = nullptr)
 {
 	const size headerSize = i_headerSize;
-	const size headerSizeAligned = (size)align_aptr((aptr)headerSize, k_defaultAlignment);
+	const size headerSizeAligned = align_size(headerSize, k_defaultAlignment);
 	const size realBytes = align_size(i_bytes + headerSizeAligned, k_defaultSizeAligment);
 	voidptr pMem = internal_malloc(realBytes, i_userData);
 
@@ -317,7 +315,8 @@ voidptr reallocate(voidptr i_data, const size i_newBytes, const size i_alignment
 	alloc_header_t* header = *ppHeader;
 
 	voidptr newData = allocate(i_newBytes, i_alignment, i_allocator);
-	memcpy(newData, i_data, min(i_newBytes, header->dataSize));
+	FLORAL_ASSERT(i_newBytes >= header->dataSize);
+	memcpy(newData, i_data, header->dataSize);
 	return newData;
 }
 
@@ -373,7 +372,7 @@ voidptr allocate(const size i_bytes, freelist_allocator_t* i_allocator)
 
 voidptr reallocate(voidptr i_data, const size i_newBytes, freelist_allocator_t* i_allocator)
 {
-	return reallocate(i_data, i_newBytes, k_defaultAlignment, i_allocator);
+	return reallocate(i_data, i_newBytes, 0, i_allocator);
 }
 
 static const bool can_fit(alloc_header_t* i_header, const size i_bytes, const size i_alignment)
@@ -517,8 +516,15 @@ voidptr reallocate(voidptr i_data, const size i_newBytes, const size i_alignment
 	alloc_header_t** ppHeader = (alloc_header_t**)((aptr)i_data - sizeof(voidptr));
 	alloc_header_t* header = *ppHeader;
 
-	voidptr newData = allocate(i_newBytes, i_alignment, i_allocator);
-	memcpy(newData, i_data, header->dataSize);
+	size alignment = i_alignment;
+	if (i_alignment == 0)
+	{
+		alignment = header->alignment;
+	}
+
+	voidptr newData = allocate(i_newBytes, alignment, i_allocator);
+	size copySize = floral::min(i_newBytes, header->dataSize);
+	memcpy(newData, i_data, copySize);
 	free(i_data, i_allocator);
 	return newData;
 }
@@ -795,7 +801,7 @@ voidptr linear_allocator_i::allocate(const size i_bytes, const size i_alignment)
 
 voidptr linear_allocator_i::reallocate(voidptr i_data, const size i_newBytes)
 {
-	return reallocate(i_data, i_newBytes, k_defaultAlignment);
+	return reallocate(i_data, i_newBytes, 0);
 }
 
 voidptr linear_allocator_i::reallocate(voidptr i_data, const size i_newBytes, const size i_alignment)

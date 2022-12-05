@@ -1,5 +1,6 @@
 #pragma once
 
+#include "configs.h"
 #include "stdaliases.h"
 
 #if defined(FLORAL_PLATFORM_WINDOWS)

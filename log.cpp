@@ -29,16 +29,18 @@ struct thread_logger_t
 	{ }
 
 	bool initialized;
+	log_level_e logLevel;
 	c8 name[128];
 };
 
 thread_local thread_logger_t tl_threadLogger;
 thread_local u64 tl_frameIndex = 0;
 
-void initialize_logger(const_cstr i_name)
+void initialize_logger(const_cstr i_name, log_level_e i_logLevel /* = log_level_e::verbose */)
 {
 	strcpy(tl_threadLogger.name, i_name);
 	tl_threadLogger.initialized = true;
+	tl_threadLogger.logLevel = i_logLevel;
 }
 
 void tick_logger()
@@ -49,6 +51,12 @@ void tick_logger()
 void logf(log_level_e i_logLevel, const_cstr i_fmt, ...)
 {
 	FLORAL_ASSERT(tl_threadLogger.initialized);
+
+	if (i_logLevel < tl_threadLogger.logLevel)
+	{
+		return;
+	}
+
 	floral::lock_guard_t guard(&s_globalMtx);
 
 	c8 str[4096];
@@ -113,7 +121,6 @@ void logf(log_level_e i_logLevel, const_cstr i_fmt, ...)
 		str[4003] = 0;
 	}
 
-	puts(str);
 	strcat(str, "\n");
 
 #if defined(FLORAL_PLATFORM_WINDOWS) || defined(FLORAL_PLATFORM_XBOX)

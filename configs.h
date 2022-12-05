@@ -4,16 +4,26 @@
 #if defined(_WIN64) || defined(_WIN32)
 #	define FLORAL_PLATFORM_WINDOWS
 #	if defined(_GAMING_XBOX_SCARLETT)
+#		define FLORAL_PLATFORM_HAS_DX12
 #		define FLORAL_PLATFORM_XBOX
 #		define FLORAL_PLATFORM_XBOX_SCARLETT
 #	elif defined(_GAMING_XBOX_XBOXONE)
+#		define FLORAL_PLATFORM_HAS_DX12
 #		define FLORAL_PLATFORM_XBOX
 #		define FLORAL_PLATFORM_XBOX_ONE
+#	else
+#		define FLORAL_PLATFORM_HAS_DX12
+#		define FLORAL_PLATFORM_HAS_GL
+#		define FLORAL_PLATFORM_HAS_VULKAN
 #	endif
 #elif defined(__ANDROID__) || defined(__linux__)
 #	define FLORAL_PLATFORM_LINUX
+#	define FLORAL_PLATFORM_HAS_VULKAN
 #	if defined(__ANDROID__)
 #		define FLORAL_PLATFORM_ANDROID
+#		define FLORAL_PLATFORM_HAS_GLES
+#	else
+#		define FLORAL_PLATFORM_HAS_GL
 #	endif
 #else
 // TODO

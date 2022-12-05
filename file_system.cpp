@@ -13,7 +13,11 @@ namespace floral
 static tchar s_workingDir[256];
 void set_working_directory(const_tcstr i_workingDir)
 {
+#if defined(UNICODE)
+	wcscpy(s_workingDir, i_workingDir);
+#else
 	strcpy(s_workingDir, i_workingDir);
+#endif
 }
 
 const size read_all_file_internal(FILE* f, p8 o_buffer)
@@ -52,6 +56,5 @@ const size read_all_file(const_tcstr i_fileName, p8 o_buffer)
 #endif
 	return read_all_file_internal(f, o_buffer);
 }
-
 // ----------------------------------------------------------------------------
 }
